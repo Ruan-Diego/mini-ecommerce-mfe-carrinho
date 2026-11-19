@@ -1,0 +1,30 @@
+.car{padding-top:var(--sp-6);padding-bottom:var(--sp-7);display:flex;flex-direction:column;gap:var(--sp-5)}
+.car h1{margin:0}
+.car-grade{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:var(--sp-6);align-items:start}
+.car-tabela{width:100%;border-collapse:collapse}
+.car-tabela th,.car-tabela td{padding:var(--sp-4) var(--sp-3);text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+.car-tabela thead th{color:var(--mu);font:500 13px var(--fb)}
+.car-produto{display:flex;flex-direction:column;gap:var(--sp-1);font:600 16px var(--fd)}
+.car-aviso{color:var(--warn);font:400 14px var(--fb)}
+.car-valor{font-family:var(--fm)}
+.car-resumo{display:flex;flex-direction:column;gap:var(--sp-4);padding:var(--sp-5);border:1px solid var(--line2);border-radius:var(--r-lg);background:var(--s1)}
+.car-resumo h2{margin:0}
+.car-cupom{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);margin:0}
+.car-cupom-form{display:flex;flex-direction:column;gap:var(--sp-2)}
+.car-cupom-linha{display:flex;gap:var(--sp-3)}
+.car-cupom-linha input{flex:1;min-height:var(--alvo);padding:0 var(--sp-3);background:var(--bg);color:var(--tx);border:1px solid var(--line2);border-radius:var(--r-md)}
+.car-cupom-linha input[aria-invalid="true"]{border-color:var(--bad)}
+.car-cupom-motivo{margin:0;color:var(--bad);font-size:14px}
+.car-totais{margin:0;display:flex;flex-direction:column;gap:var(--sp-2)}
+.car-totais div{display:flex;justify-content:space-between;gap:var(--sp-4)}
+.car-totais dt{color:var(--mu)}
+.car-totais dd{margin:0;font-family:var(--fm)}
+.car-total dt,.car-total dd{color:var(--tx);font:600 20px var(--fd)}
+.car-vazio{display:flex;flex-direction:column;align-items:flex-start;gap:var(--sp-4);padding:var(--sp-5) 0}
+.car-vazio p{margin:0;color:var(--mu)}
+.car-erro{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4);border:1px solid var(--bad);border-radius:var(--r-md)}
+.car-erro p{margin:0}
+.car-skeleton{height:220px;border-radius:var(--r-lg);background:var(--s1);animation:car-pulso 1.2s ease-in-out infinite}
+@keyframes car-pulso{50%{opacity:.5}}
+@media (prefers-reduced-motion:reduce){.car-skeleton{animation:none}}
+@media (max-width:860px){.car-grade{grid-template-columns:1fr}.car-tabela thead{display:none}.car-tabela,.car-tabela tbody,.car-tabela tr,.car-tabela td,.car-tabela th{display:block}.car-tabela tr{padding:var(--sp-3) 0;border-bottom:1px solid var(--line)}.car-tabela th,.car-tabela td{border:0;padding:var(--sp-2) 0}}

@@ -2,70 +2,7 @@ import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { criarEventBus, type EventBus, type EventosMini } from '@ruan-diego/mini-event-contracts';
 import { MiniCarrinho } from './MiniCarrinho';
-import type { Carrinho, CupomAplicado, ItemCarrinho } from '../api/carrinho';
-
-const CATALOGO: Record<string, { nome: string; preco: number }> = {
-  p1: { nome: 'Esfera Chrome', preco: 100 },
-  p2: { nome: 'Cubo Preto', preco: 50 },
-};
-
-interface Chamada {
-  metodo: string;
-  caminho: string;
-  cabecalhos: Record<string, string>;
-  corpo: unknown;
-}
-
-/** Carrinho-service de mentira, em memória: responde como o de verdade, com o carrinho inteiro a cada chamada. */
-function backend(inicial: { itens?: ItemCarrinho[]; cupom?: CupomAplicado; desconto?: number } = {}) {
-  const estado = { itens: inicial.itens ?? [], cupom: inicial.cupom ?? null, desconto: inicial.desconto ?? 0, falhaNaCarga: false };
-  const chamadas: Chamada[] = [];
-
-  const montar = (): Carrinho => {
-    const subtotal = estado.itens.reduce((s, i) => s + i.subtotal, 0);
-    return {
-      itens: estado.itens,
-      quantidadeTotal: estado.itens.reduce((s, i) => s + i.quantidade, 0),
-      subtotal,
-      cupom: estado.cupom,
-      desconto: estado.desconto,
-      total: subtotal - estado.desconto,
-    };
-  };
-  const json = (status: number, corpo: unknown) => new Response(JSON.stringify(corpo), { status });
-  const problema = (status: number, detail: string) => json(status, { title: 'erro', detail });
-  const item = (id: string, quantidade: number): ItemCarrinho => ({
-    produtoId: id, nome: CATALOGO[id].nome, precoUnitario: CATALOGO[id].preco, quantidade,
-    subtotal: CATALOGO[id].preco * quantidade, precoAlterado: false, precoAnterior: null,
-  });
-
-  vi.stubGlobal('fetch', vi.fn(async (url: string, init: RequestInit = {}) => {
-    const caminho = new URL(url, 'http://gateway').pathname;
-    const metodo = init.method ?? 'GET';
-    const corpo = init.body ? JSON.parse(init.body as string) : undefined;
-    chamadas.push({ metodo, caminho, cabecalhos: init.headers as Record<string, string>, corpo });
-
-    if (metodo === 'GET') return estado.falhaNaCarga ? json(500, {}) : json(200, montar());
-    if (metodo === 'POST') {
-      if (!CATALOGO[corpo.produtoId]) return problema(404, `produto ${corpo.produtoId} não existe ou está inativo`);
-      const atual = estado.itens.find((i) => i.produtoId === corpo.produtoId);
-      const total = (atual?.quantidade ?? 0) + corpo.quantidade;
-      if (total > 10) return problema(422, `quantidade deve ficar entre 1 e 10 por item: ${total}`);
-      estado.itens = atual ? estado.itens.map((i) => (i === atual ? item(i.produtoId, total) : i)) : [...estado.itens, item(corpo.produtoId, total)];
-      return json(200, montar());
-    }
-    const id = decodeURIComponent(caminho.split('/').pop() ?? '');
-    if (metodo === 'PUT') {
-      if (corpo.quantidade > 10) return problema(422, `quantidade deve ficar entre 1 e 10 por item: ${corpo.quantidade}`);
-      estado.itens = estado.itens.map((i) => (i.produtoId === id ? item(id, corpo.quantidade) : i));
-      return json(200, montar());
-    }
-    estado.itens = estado.itens.filter((i) => i.produtoId !== id);
-    return json(200, montar());
-  }));
-
-  return { estado, chamadas, item };
-}
+import { backend } from '../backendFalso';
 
 function montarDrawer(opcoes: { token?: string | null } = {}) {
   const eventBus: EventBus = criarEventBus(new EventTarget());

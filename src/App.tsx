@@ -10,7 +10,7 @@ import { MiniCarrinho } from './pages/MiniCarrinho';
 export default function App({ eventBus, getToken }: PropsRemoto) {
   return (
     <Routes>
-      <Route index element={<Carrinho />} />
+      <Route index element={<Carrinho eventBus={eventBus} getToken={getToken} />} />
       <Route path="mini" element={<MiniCarrinho eventBus={eventBus} getToken={getToken} />} />
       <Route path="*" element={<p className="wrap muted">Página não encontrada neste microfrontend.</p>} />
     </Routes>
