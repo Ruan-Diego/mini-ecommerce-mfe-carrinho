@@ -7,11 +7,11 @@ import { MiniCarrinho } from './pages/MiniCarrinho';
  * Módulo exposto como ./App. O shell monta este componente numa rota com "/*",
  * então as rotas abaixo são relativas a props.basePath.
  */
-export default function App(_props: PropsRemoto) {
+export default function App({ eventBus, getToken }: PropsRemoto) {
   return (
     <Routes>
       <Route index element={<Carrinho />} />
-      <Route path="mini" element={<MiniCarrinho />} />
+      <Route path="mini" element={<MiniCarrinho eventBus={eventBus} getToken={getToken} />} />
       <Route path="*" element={<p className="wrap muted">Página não encontrada neste microfrontend.</p>} />
     </Routes>
   );
