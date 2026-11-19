@@ -122,3 +122,8 @@ export const alterarQuantidade = (obterToken: ObterToken, produtoId: string, qua
 
 export const removerItem = (obterToken: ObterToken, produtoId: string) =>
   chamar('DELETE', `/carrinhos/atual/itens/${encodeURIComponent(produtoId)}`, obterToken);
+
+export const aplicarCupom = (obterToken: ObterToken, codigo: string) =>
+  chamar('POST', '/carrinhos/atual/cupom', obterToken, { codigo });
+
+export const removerCupom = (obterToken: ObterToken) => chamar('DELETE', '/carrinhos/atual/cupom', obterToken);
