@@ -66,6 +66,8 @@ function comQuantidade(carrinho: Carrinho, produtoId: string, quantidade: number
  * As ações entram numa fila: duas adições seguidas rodam uma depois da outra, então a resposta mais velha
  * nunca sobrescreve a mais nova.
  */
+const CARRINHO_VAZIO: Carrinho = { itens: [], quantidadeTotal: 0, subtotal: 0, cupom: null, desconto: 0, total: 0 };
+
 export function useCarrinho(eventBus: EventBus, obterToken: ObterToken): [EstadoCarrinho, AcoesCarrinho] {
   const [estado, setEstado] = useState<EstadoCarrinho>({ situacao: 'carregando', carrinho: null, ocupado: false, erroDeAcao: null });
   const [tentativa, setTentativa] = useState(0);
@@ -105,8 +107,11 @@ export function useCarrinho(eventBus: EventBus, obterToken: ObterToken): [Estado
     setTentativa((t) => t + 1);
   }, []);
 
-  // Depois da compra o checkout avisa que o carrinho foi esvaziado: busca de novo o que o servidor tem.
-  useEffect(() => eventBus.on('carrinho:limpo', recarregar), [eventBus, recarregar]);
+  // Depois da compra o checkout avisa que o carrinho foi esvaziado. Vale o aviso: o estado local passa a ser vazio
+  // sem consultar o servidor, porque ele esvazia o carrinho de forma assíncrona (consome PedidoCriado pela
+  // outbox e pelo RabbitMQ) e uma consulta imediata ainda devolveria os itens da compra, fazendo o badge do
+  // shell zerar e voltar a mostrar a quantidade antiga.
+  useEffect(() => eventBus.on('carrinho:limpo', () => aplicar(CARRINHO_VAZIO)), [eventBus, aplicar]);
 
   // Outra instância mudou o carrinho: sincroniza sem emitir (ver o comentário do hook).
   useEffect(
