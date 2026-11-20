@@ -230,16 +230,20 @@ describe('MiniCarrinho: falha ao carregar e carrinho:limpo', () => {
     expect(await screen.findByText('Esfera Chrome')).toBeInTheDocument();
   });
 
-  it('carrinho:limpo (compra concluída) busca o carrinho de novo e o badge zera', async () => {
+  // Achado no E2E: o servidor esvazia o carrinho depois (evento assíncrono); reconsultar na hora devolvia os itens
+  // da compra e o badge voltava à quantidade antiga.
+  it('carrinho:limpo (compra concluída) esvazia na hora, sem reconsultar o servidor, e o badge zera', async () => {
     const b = backend();
     b.estado.itens = [b.item('p1', 2)];
     const { eventBus, atualizados } = montarDrawer();
     await waitFor(() => expect(atualizados.at(-1)).toEqual({ quantidadeTotal: 2, subtotal: 200 }));
+    const consultasAntes = b.chamadas.filter((c) => c.metodo === 'GET').length;
 
-    b.estado.itens = [];
+    // O servidor ainda tem os itens (ainda não consumiu o evento do pedido): o aviso do checkout é que vale.
     act(() => eventBus.emit('carrinho:limpo', {}));
 
     await waitFor(() => expect(atualizados.at(-1)).toEqual({ quantidadeTotal: 0, subtotal: 0 }));
+    expect(b.chamadas.filter((c) => c.metodo === 'GET')).toHaveLength(consultasAntes);
   });
 });
 
